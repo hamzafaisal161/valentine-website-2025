@@ -9,11 +9,43 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Blocking music prompt overlay */
+        #musicPrompt {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        #musicPrompt .music-prompt-card {
+            background: white;
+            color: #333;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 90%;
+        }
+        #musicPrompt .music-prompt-card h2 { margin: 0 0 8px; }
+        #musicPrompt .cute-btn { font-size: 1rem; padding: 10px 16px; }
+    </style>
 </head>
 <body>
     <!-- Floating Background Elements -->
     <div class="floating-elements">
         <!-- Hearts and bears will be added here by JavaScript -->
+    </div>
+
+    <!-- Blocking music prompt shown on page load; user must click to continue -->
+    <div id="musicPrompt" class="hidden">
+        <div class="music-prompt-card">
+            <h2>Play music to continue</h2>
+            <p>Please tap the button below to enable background music.</p>
+            <button id="promptPlayBtn" class="cute-btn">🎵 Play Music</button>
+        </div>
     </div>
 
     <!-- Main Content Container -->

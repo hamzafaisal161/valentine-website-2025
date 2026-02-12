@@ -80,8 +80,13 @@ window.addEventListener('DOMContentLoaded', () => {
     // Create initial floating elements
     createFloatingElements();
 
-    // Setup music player
+    // Setup music player (configures audio and controls)
     setupMusicPlayer();
+
+    // Show blocking music prompt if music is enabled
+    if (config.music && config.music.enabled) {
+        showMusicPrompt();
+    }
 });
 
 // Create floating hearts and bears
@@ -218,16 +223,8 @@ function setupMusicPlayer() {
     bgMusic.volume = config.music.volume || 0.5;
     bgMusic.load();
 
-    // Try autoplay if enabled
-    if (config.music.autoplay) {
-        const playPromise = bgMusic.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log("Autoplay prevented by browser");
-                musicToggle.textContent = config.music.startText;
-            });
-        }
-    }
+    // Default toggle text
+    musicToggle.textContent = config.music.startText;
 
     // Toggle music on button click
     musicToggle.addEventListener('click', () => {
@@ -240,3 +237,40 @@ function setupMusicPlayer() {
         }
     });
 } 
+
+// Show a blocking prompt that only allows the user to play music.
+function showMusicPrompt() {
+    const prompt = document.getElementById('musicPrompt');
+    const promptBtn = document.getElementById('promptPlayBtn');
+    const musicToggle = document.getElementById('musicToggle');
+    const bgMusic = document.getElementById('bgMusic');
+
+    if (!prompt || !promptBtn || !bgMusic) return;
+
+    // Ensure the prompt covers the screen
+    prompt.classList.remove('hidden');
+    prompt.style.display = 'flex';
+
+    const startMusicAndContinue = () => {
+        // Attempt to play the audio (user gesture should allow it)
+        bgMusic.play().then(() => {
+            musicToggle.textContent = config.music.stopText;
+        }).catch(() => {
+            // If play fails for any reason, ensure toggle shows start text
+            musicToggle.textContent = config.music.startText;
+        }).finally(() => {
+            // Hide the prompt and allow interaction
+            prompt.style.display = 'none';
+            prompt.classList.add('hidden');
+        });
+    };
+
+    promptBtn.addEventListener('click', startMusicAndContinue, { once: true });
+    // Also allow pressing Enter/Space when focused
+    promptBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            startMusicAndContinue();
+        }
+    });
+}
